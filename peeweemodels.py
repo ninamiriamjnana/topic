@@ -24,6 +24,8 @@ class Post (MySQLModel):
     user= ForeignKeyField (User)	
     topic= ForeignKeyField (Topic)
 
+  
+
 class HTMLPage(MySQLModel):
       url=CharField(index=True)
       body=TextField ()
