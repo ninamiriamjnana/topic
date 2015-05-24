@@ -77,7 +77,9 @@ def best_ngrams(words, top_n=10, min_freq=5):
     return pat_gram2, pat_gram3
 
 
-class PPosts_Collocations(object): # damit mach ich tokens wo die häufigsten tri- und bigrams gleich zusammengenommen werden
+class PPosts_Collocations(object): 
+    """ damit mach ich tokens wo die haeufigsten tri- und bigrams gleich
+    zusammengenommen werden"""
     def __init__(self):
         logging.info("collecting ngrams from postd")
         # generator of documents; one element = list of words
@@ -89,7 +91,7 @@ class PPosts_Collocations(object): # damit mach ich tokens wo die häufigsten tr
 
 
 
-    def split_words(self, text, stopwords=stopset):
+    def split_words(self, text, stopwords=stopset): # here: no lemmatization!
         """
         Break text into a list of single words. Ignore any token that falls into
         the `stopwords` set.
@@ -117,5 +119,9 @@ class PPosts_Collocations(object): # damit mach ich tokens wo die häufigsten tr
         for post in posts.naive().iterator():
             yield self.tokenize(post.text)
 
-#%time collocations_corpus = Corpus20News_Collocations('./data/20news-bydate.tar.gz')
+""" ok das versteh ich nicht. was ich jetzt machen muss: ein dictionary. mit was? wozu?"""
+""" DAS BRAUCH ICH: The dictionary object now contains all words that appeared in the corpus, along with how many times they appeared. """
+#%time collocations_corpus = PPosts_Collocation
+# doc_stream = (tokens for _, tokens in collocations_corpus)
+# id2word_wiki = gensim.corpora.Dictionary(doc_stream)
 #print(list(itertools.islice(collocations_corpus, 2)))
