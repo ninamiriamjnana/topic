@@ -124,7 +124,11 @@ class PPosts_Collocations(object):
         for post in posts.naive().iterator():
             yield self.tokenize(post.text)
 
-def make_freq_dict():
+
+    
+
+
+def make_vector():
  
     corpus=PPosts_Collocations()
     frequency = defaultdict(int)  
@@ -136,25 +140,64 @@ def make_freq_dict():
     from pprint import pprint   # pretty-printer
     pprint(frequency) #frequency dict
 
-    dictionary = corpora.Dictionary(corpus) # dict with ids
+    pdict = corpora.Dictionary(corpus) # dict with ids DAS IST DAS ID 2 WORD WIKI
 
-    pprint(dictionary)
+    pprint(pdict)
 
-    print(dictionary.token2id)
-    """
-    from collections import defaultdict
-    fq= defaultdict( int )
-    for w in words:
-    fq[w] += 1
+    print(pdict.token2id)
 
-    a = [1,1,1,1,2,2,2,2,3,3,4,5,5]
-    >>> d = {x:a.count(x) for x in a}
-    >>> d
-    {1: 4, 2: 4, 3: 2, 4: 1, 5: 2}"""
+    return pdict
+ 
+class PPostCorpus(object):
+    def __init__(self,dictionary):
+        """
+        Parse the first `clip_docs` Wikipedia documents from file `dump_file`.
+        Yield each document in turn, as a list of tokens (unicode strings).
+        
+        """
+        self.dictionary = dictionary
+        logging.info("collecting ngrams from postd")
+        # generator of documents; one element = list of words
+        posts=Post.select()
+        documents=(self.split_words(post.text) for post in posts.naive().iterator())
+        # generator: concatenate (chain) all words into a single sequence, lazily
+        words = itertools.chain.from_iterable(documents)
+        self.bigrams, self.trigrams = best_ngrams(words)
 
-""" ok das versteh ich nicht. was ich jetzt machen muss: ein dictionary. mit was? wozu?"""
-""" DAS BRAUCH ICH: The dictionary object now contains all words that appeared in the corpus, along with how many times they appeared. """
-#%time collocations_corpus = PPosts_Collocation
-# doc_stream = (tokens for _, tokens in collocations_corpus)
-# id2word_wiki = gensim.corpora.Dictionary(doc_stream)
-#print(list(itertools.islice(collocations_corpus, 2)))"""
+    def split_words(self, text, stopwords=stopset): # here: no lemmatization!
+        """
+        Break text into a list of single words. Ignore any token that falls into
+        the `stopwords` set.
+
+        """
+        return [word
+                for word in gensim.utils.tokenize(text, lower=True)
+                if word not in stopset and len(word) > 3] # stopset from pattern
+
+    def tokenize(self, message):
+        """
+        Break text (string) into a list of Unicode tokens.
+        
+        The resulting tokens can be longer phrases (collocations) too,
+        e.g. `new_york`, `real_estate` etc.
+
+        """
+        text = u' '.join(self.split_words(message))
+        text = re.sub(self.trigrams, lambda match: match.group(0).replace(u' ', u'_'), text)
+        text = re.sub(self.bigrams, lambda match: match.group(0).replace(u' ', u'_'), text)
+        return text.split()
+        
+
+    def __iter__(self):
+      posts=Post.select()
+      for post in posts.naive().iterator():
+          yield self.dictionary.doc2bow(self.tokenize(post.text))
+    
+   
+
+# create a stream of bag-of-words vectors
+#pcorpus = PPostCorpus(id2word) JAHAAAA
+# %time gensim.corpora.MmCorpus.serialize('premium_bow.mm', pcorpus) store vector
+#mm_corpus = gensim.corpora.MmCorpus('premium_bow.mm')
+#print(mm_corpus)
+
