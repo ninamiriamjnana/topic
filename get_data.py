@@ -12,6 +12,9 @@ from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
 
 import re
 
+#for creating the frequency dictionary
+from collections import defaultdict
+
 # set of stopwords for german
 stopset = set(nltk.corpus.stopwords.words('german'))
 
@@ -119,9 +122,26 @@ class PPosts_Collocations(object):
         for post in posts.naive().iterator():
             yield self.tokenize(post.text)
 
+    """   
+
+    frequency = defaultdict(int)
+    for text in texts: # hier muss ich ja eigentlich das __iter__ aufrufen!
+        for token in text: # das hier habe ich ja schon? ich krieg ja immer einen token zurueck mit dem iter
+           frequency[token] += 1
+
+    from collections import defaultdict
+    fq= defaultdict( int )
+    for w in words:
+    fq[w] += 1
+
+    a = [1,1,1,1,2,2,2,2,3,3,4,5,5]
+    >>> d = {x:a.count(x) for x in a}
+    >>> d
+    {1: 4, 2: 4, 3: 2, 4: 1, 5: 2}"""
+
 """ ok das versteh ich nicht. was ich jetzt machen muss: ein dictionary. mit was? wozu?"""
 """ DAS BRAUCH ICH: The dictionary object now contains all words that appeared in the corpus, along with how many times they appeared. """
 #%time collocations_corpus = PPosts_Collocation
 # doc_stream = (tokens for _, tokens in collocations_corpus)
 # id2word_wiki = gensim.corpora.Dictionary(doc_stream)
-#print(list(itertools.islice(collocations_corpus, 2)))
+#print(list(itertools.islice(collocations_corpus, 2)))"""
