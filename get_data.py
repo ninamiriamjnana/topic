@@ -6,6 +6,8 @@ import itertools
 
 import gensim
 
+from gensim import corpora
+
 import nltk
 from nltk.collocations import TrigramCollocationFinder
 from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
@@ -122,13 +124,24 @@ class PPosts_Collocations(object):
         for post in posts.naive().iterator():
             yield self.tokenize(post.text)
 
-    """   
+def make_freq_dict():
+ 
+    corpus=PPosts_Collocations()
+    frequency = defaultdict(int)  
+          
+    for post in corpus: # hier muss ich ja eigentlich das __iter__ aufrufen!
+        for token in post: # das hier habe ich ja schon? ich krieg ja immer einen token zurueck mit dem iter
+            frequency[token] += 1
 
-    frequency = defaultdict(int)
-    for text in texts: # hier muss ich ja eigentlich das __iter__ aufrufen!
-        for token in text: # das hier habe ich ja schon? ich krieg ja immer einen token zurueck mit dem iter
-           frequency[token] += 1
+    from pprint import pprint   # pretty-printer
+    pprint(frequency) #frequency dict
 
+    dictionary = corpora.Dictionary(corpus) # dict with ids
+
+    pprint(dictionary)
+
+    print(dictionary.token2id)
+    """
     from collections import defaultdict
     fq= defaultdict( int )
     for w in words:
